@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency & Measurement Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #fff;
+            text-align: center;
+            background: #000; /* Fallback background color */
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: url('https://i.postimg.cc/PfcN6Z58/20250122-103938-0000-removebg-preview.png') no-repeat center center;
+            background-size: contain;
+            width: 500px;
+            height: 500px;
+            z-index: -1;
+            opacity: 0.6; /* Slight transparency */
+        }
+
+        header {
+            background: #000080; /* Dark Blue */
+            padding: 20px 0;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-container {
+            margin: 40px auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .converter {
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        input, select, button {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px auto;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            display: block;
+            text-align: left;
+        }
+
+        input {
+            background: #fff;
+            color: #333;
+        }
+
+        select {
+            background: #ffe7e0;
+            color: #333;
+        }
+
+        button {
+            background: #28a745;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tabs button {
+            flex: 1;
+            margin: 0 5px;
+            padding: 10px;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .tabs button.active {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay Background -->
+    <div class="background-overlay"></div>
+
+    <header>
+        Currency & Measurement Converter
+    </header>
+
+    <div class="main-container">
+        <div class="tabs">
+            <button id="measurementTab" class="active" onclick="showConverter('measurement')">Measurement Converter</button>
+            <button id="currencyTab" onclick="showConverter('currency')">Currency Converter</button>
+        </div>
+
+        <div id="currencyConverter" class="converter" style="display: none;">
+            <h2>Convert Your Money</h2>
+
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" placeholder="Enter amount" />
+
+            <label for="fromCurrency">From:</label>
+            <select id="fromCurrency">
+                <option value="USD">USD - US Dollar</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="INR">INR - Indian Rupee</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="AUD">AUD - Australian Dollar</option>
+            </select>
+
+            <label for="toCurrency">To:</label>
+            <select id="toCurrency">
+                <option value="USD">USD - US Dollar</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="INR">INR - Indian Rupee</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="AUD">AUD - Australian Dollar</option>
+            </select>
+
+            <button onclick="convertCurrency()">Convert</button>
+
+            <div id="result" class="result"></div>
+        </div>
+
+        <div id="measurementConverter" class="converter">
+            <h2>Convert Measurements</h2>
+
+            <label for="measurementAmount">Amount:</label>
+            <input type="number" id="measurementAmount" placeholder="Enter amount" />
+
+            <label for="fromMeasurement">From:</label>
+            <select id="fromMeasurement">
+                <option value="meter">Meter</option>
+                <option value="kilometer">Kilometer</option>
+                <option value="mile">Mile</option>
+            </select>
+
+            <label for="toMeasurement">To:</label>
+            <select id="toMeasurement">
+                <option value="meter">Meter</option>
+                <option value="kilometer">Kilometer</option>
+                <option value="mile">Mile</option>
+            </select>
+
+            <button onclick="convertMeasurement()">Convert</button>
+
+            <div id="measurementResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        function showConverter(type) {
+            const currencyConverter = document.getElementById('currencyConverter');
+            const measurementConverter = document.getElementById('measurementConverter');
+            const currencyTab = document.getElementById('currencyTab');
+            const measurementTab = document.getElementById('measurementTab');
+
+            if (type === 'currency') {
+                currencyConverter.style.display = 'block';
+                measurementConverter.style.display = 'none';
+                currencyTab.classList.add('active');
+                measurementTab.classList.remove('active');
+            } else {
+                currencyConverter.style.display = 'none';
+                measurementConverter.style.display = 'block';
+                measurementTab.classList.add('active');
+                currencyTab.classList.remove('active');
+            }
+        }
+
+        function convertCurrency() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const from = document.getElementById('fromCurrency').value;
+            const to = document.getElementById('toCurrency').value;
+            const resultDiv = document.getElementById('result');
+
+            if (isNaN(amount)) {
+                resultDiv.innerText = "Please enter a valid amount.";
+                return;
+            }
+
+            resultDiv.innerText = `${amount} ${from} is approximately ${(amount * 1.1).toFixed(2)} ${to}.`;
+        }
+
+        function convertMeasurement() {
+            const amount = parseFloat(document.getElementById('measurementAmount').value);
+            const from = document.getElementById('fromMeasurement').value;
+            const to = document.getElementById('toMeasurement').value;
+            const resultDiv = document.getElementById('measurementResult');
+
+            if (isNaN(amount)) {
+                resultDiv.innerText = "Please enter a valid amount.";
+                return;
+            }
+
+            resultDiv.innerText = `${amount} ${from} is approximately ${(amount * 1.2).toFixed(2)} ${to}.`;
+        }
+    </script>
+</body>
+</html>
